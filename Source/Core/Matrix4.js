@@ -281,6 +281,39 @@ define([
         return result;
     };
 
+/**
+     * Computes a Matrix4 instance from a Matrix3 representing the rotation.
+     *
+     * @param {Matrix3} rotation The upper left portion of the matrix representing the rotation.
+     * @param {Matrix4} [result] The object in which the result will be stored, if undefined a new instance will be created.
+     * @returns {Matrix4} The modified result parameter, or a new Matrix4 instance if one was not provided.
+     */
+    Matrix4.fromRotation = function(rotation, result) {
+        //>>includeStart('debug', pragmas.debug);
+        Check.typeOf.object('rotation', rotation);
+        //>>includeEnd('debug');
+
+        if (!defined(result)) {
+            return new Matrix4(rotation[0], rotation[3], rotation[6],           0.0,
+                               rotation[1], rotation[4], rotation[7],           0.0,
+                               rotation[2], rotation[5], rotation[8],           0.0,
+                                       0.0,         0.0,         0.0,           1.0);
+        }
+
+        result[0] = rotation[0];
+        result[1] = rotation[1];
+        result[2] = rotation[2];
+        result[4] = rotation[3];
+        result[5] = rotation[4];
+        result[6] = rotation[5];
+        result[8] = rotation[6];
+        result[9] = rotation[7];
+        result[10] = rotation[8];
+        result[15] = 1.0;
+
+        return result;
+    }
+
     /**
      * Computes a Matrix4 instance from a Matrix3 representing the rotation
      * and a Cartesian3 representing the translation.

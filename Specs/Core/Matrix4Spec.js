@@ -172,6 +172,23 @@ defineSuite([
         expect(returnedResult).toEqual(expected);
     });
 
+    it('fromRotation works without a result parameter', function() {
+        var expected = new Matrix3(1.0, 2.0, 3.0, 0.0, 4.0, 5.0, 6.0, 0.0, 7.0, 8.0, 9.0, 0.0, 0.0, 0.0, 0.0, 1.0);
+        var returnedResult = Matrix4.fromRotation(new Matrix3(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0));
+        expect(returnedResult).not.toBe(expected);
+        expect(returnedResult).toEqual(expected);
+    });
+
+    it('fromRotation works with a result parameter', function() {
+        var expected = new Matrix3(1.0, 2.0, 3.0, 0.0, 4.0, 5.0, 6.0, 0.0, 7.0, 8.0, 9.0, 0.0, 0.0, 0.0, 0.0, 1.0);
+        var result = new Matrix4();
+        var returnedResult = Matrix4.fromRotation(new Matrix3(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0), result);
+        expect(returnedResult).toBe(result);
+        expect(returnedResult).not.toBe(expected);
+        expect(returnedResult).toEqual(expected);
+    });
+
+
     it('fromRotationTranslation works without a result parameter', function() {
         var expected = new Matrix4(1.0, 2.0, 3.0, 10.0, 4.0, 5.0, 6.0, 11.0, 7.0, 8.0, 9.0, 12.0, 0.0, 0.0, 0.0, 1.0);
         var returnedResult = Matrix4.fromRotationTranslation(new Matrix3(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0), new Cartesian3(10.0, 11.0, 12.0));

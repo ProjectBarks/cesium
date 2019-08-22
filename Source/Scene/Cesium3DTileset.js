@@ -17,10 +17,12 @@ define([
         '../Core/JulianDate',
         '../Core/ManagedArray',
         '../Core/Math',
+        '../Core/Matrix3',
         '../Core/Matrix4',
         '../Core/Resource',
         '../Core/RuntimeError',
         '../Core/Transforms',
+        '../Core/Quaternion',
         '../Renderer/ClearCommand',
         '../Renderer/Pass',
         '../Renderer/RenderState',
@@ -68,10 +70,12 @@ define([
         JulianDate,
         ManagedArray,
         CesiumMath,
+        Matrix3,
         Matrix4,
         Resource,
         RuntimeError,
         Transforms,
+        Quaternion,
         ClearCommand,
         Pass,
         RenderState,
@@ -1274,7 +1278,7 @@ define([
                 }
                 //>>includeEnd('debug');
 
-                this._root.updateTransform(this._modelMatrix);
+                this.root.updateTransform(this._modelMatrix);
                 return this._root.boundingSphere;
             }
         },
@@ -1303,6 +1307,44 @@ define([
             },
             set : function(value) {
                 this._modelMatrix = Matrix4.clone(value, this._modelMatrix);
+            }
+        },
+
+        position : {
+            get : function() {
+                return this.boundingSphere.center.clone();
+            },
+            set : function(value) {
+                value = value.clone();
+                var matrix = this._modelMatrix;
+                var oldTranslation = Matrix4.getTranslation(this._modelMatrix, new Cartesian3());
+
+                Cartesian3.subtract(value, this.boundingSphere.center, value);
+                Cartesian3.add(value, oldTranslation, value);
+                Matrix4.fromTranslation(value, matrix);
+            }
+        },
+
+        rotation : {
+            get : function () {
+                var rotationMatrix = Matrix4.getRotation(this._modelMatrix, new Matrix3());
+                return Quaternion.fromRotationMatrix(rotationMatrix);
+            },
+            set : function (value) {
+                Check.typeOf.object('quaternion', value);
+
+                var matrix = this._modelMatrix;
+                var center = this.boundingSphere.center.clone();
+                var rotation = new Quaternion();
+                var scratchMatrix = new Matrix3();
+
+                var fixedFrameRotation = Transforms.eastNorthUpToFixedFrame(center);
+                Quaternion.fromRotationMatrix(Matrix4.getRotation(fixedFrameRotation, scratchMatrix), rotation);
+
+                Quaternion.multiply(rotation, value, rotation);
+
+                Matrix3.fromQuaternion(rotation, scratchMatrix);
+                Matrix4.fromRotation(scratchMatrix, matrix);
             }
         },
 
